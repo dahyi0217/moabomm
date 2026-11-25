@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOABOM (모아봄) — AI 기반 디자인 레퍼런스 분류 및 탐색 웹 보드</title>
+  <meta
+    name="description"
+    content="흩어진 디자인 레퍼런스를 한곳에 모아, AI로 정리하고 자연어로 쉽게 봄 — 멀티모달 AI 자동 태깅 및 자연어 검색 보드"
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Public+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 4.1 Floating Minimal Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <button type="button" class="brand-wordmark" id="brandHomeBtn" title="전체 레퍼런스 보기">
+        <span class="brand-wordmark__en">MOABOM</span>
+        <span class="brand-wordmark__ko">모아봄</span>
+      </button>
+
+      <div class="search-pill-wrap" role="search">
+        <span class="search-pill-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-pill-input"
+          placeholder="자연어나 #태그로 검색 (예: 차분한 브라운 톤의 여백 많은 편집 디자인)"
+          aria-label="레퍼런스 자연어 및 태그 통합 검색"
+        />
+        <button type="button" id="clearSearchBtn" class="search-clear-btn" aria-label="검색어 지우기">×</button>
+        <button type="button" id="submitSearchBtn" class="search-submit-btn" aria-label="검색 실행" title="검색 로그 기록 및 실행">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div class="header-controls">
+        <!-- Custom Topic Dropdown -->
+        <div class="custom-dropdown" id="topicDropdown">
+          <button type="button" class="custom-dropdown__trigger" id="topicDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">
+            <span id="topicDropdownLabel">프로젝트 주제: 전체</span>
+            <svg class="custom-dropdown__chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M6 9l6 6 6-6"></path>
+            </svg>
+          </button>
+          <div class="custom-dropdown__menu" id="topicDropdownMenu" role="listbox" aria-label="프로젝트 주제 필터" hidden>
+            <div class="custom-dropdown__item is-selected" role="option" data-topic-value="all">프로젝트 주제: 전체</div>
+            <!-- populated by JS -->
+            <div class="custom-dropdown__divider"></div>
+            <div class="custom-dropdown__add-row">
+              <input type="text" id="newTopicInput" class="custom-dropdown__add-input" placeholder="새 주제 직접 입력…" />
+              <button type="button" id="addTopicBtn" class="custom-dropdown__add-btn">추가</button>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" id="openAddModalBtn">
+          + 레퍼런스 추가
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subtle Editorial Filter & Cross-Filtering Toolbar -->
+  <section class="gallery-toolbar" aria-label="탐색 필터">
+    <div class="toolbar-top-row">
+      <div class="toolbar-status">
+        <span class="gallery-count" id="galleryCount">총 <strong>10</strong>개의 레퍼런스</span>
+
+        <div class="status-filter-pills" role="group" aria-label="검수 상태 필터">
+          <button type="button" class="status-pill is-active" data-status-filter="all">전체</button>
+          <button type="button" class="status-pill" data-status-filter="verified">검토 완료</button>
+          <button type="button" class="status-pill" data-status-filter="draft">AI 초안</button>
+        </div>
+      </div>
+
+      <div class="category-filters" aria-label="4대 카테고리 교차 필터">
+        <!-- Custom Cat Dropdowns -->
+        <div class="custom-dropdown cat-dropdown" id="catDropdown_색감" data-category="색감">
+          <button type="button" class="custom-dropdown__trigger custom-dropdown__trigger--cat" aria-haspopup="listbox" aria-expanded="false">
+            <span class="cat-dropdown-label">색감: 전체</span>
+            <svg class="custom-dropdown__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="custom-dropdown__menu" role="listbox" aria-label="색감 필터" hidden></div>
+        </div>
+        <div class="custom-dropdown cat-dropdown" id="catDropdown_구성" data-category="구성">
+          <button type="button" class="custom-dropdown__trigger custom-dropdown__trigger--cat" aria-haspopup="listbox" aria-expanded="false">
+            <span class="cat-dropdown-label">구성: 전체</span>
+            <svg class="custom-dropdown__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="custom-dropdown__menu" role="listbox" aria-label="구성 필터" hidden></div>
+        </div>
+        <div class="custom-dropdown cat-dropdown" id="catDropdown_분위기" data-category="분위기">
+          <button type="button" class="custom-dropdown__trigger custom-dropdown__trigger--cat" aria-haspopup="listbox" aria-expanded="false">
+            <span class="cat-dropdown-label">분위기: 전체</span>
+            <svg class="custom-dropdown__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="custom-dropdown__menu" role="listbox" aria-label="분위기 필터" hidden></div>
+        </div>
+        <div class="custom-dropdown cat-dropdown" id="catDropdown_매체" data-category="매체">
+          <button type="button" class="custom-dropdown__trigger custom-dropdown__trigger--cat" aria-haspopup="listbox" aria-expanded="false">
+            <span class="cat-dropdown-label">매체: 전체</span>
+            <svg class="custom-dropdown__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="custom-dropdown__menu" role="listbox" aria-label="매체 필터" hidden></div>
+        </div>
+        <button type="button" class="reset-filters-btn" id="resetFiltersBtn" hidden>필터 초기화</button>
+      </div>
+    </div>
+
+    <div class="toolbar-query-row">
+      <span class="query-label">추천 자연어 · 태그 질의</span>
+      <button type="button" class="query-chip" data-quick-query="차분한 브라운 톤의 여백 많은 편집 디자인">차분한 브라운 톤의 여백 많은 편집 디자인</button>
+      <button type="button" class="query-chip" data-quick-query="따뜻한 감성의 패키지 브랜딩">따뜻한 감성의 패키지 브랜딩</button>
+      <button type="button" class="query-chip" data-quick-query="모던한 기하학 그리드">#기하학 #그리드</button>
+      <button type="button" class="query-chip" data-quick-query="종이 질감 텍스처">종이 질감 텍스처</button>
+      <button type="button" class="query-chip" data-quick-query="#저채도">#저채도</button>
+    </div>
+  </section>
+
+  <!-- 4.2 Asymmetric Masonry Gallery -->
+  <main class="gallery-main">
+    <div class="masonry-grid" id="masonryGrid" aria-live="polite"></div>
+
+    <div class="empty-state" id="emptyState" hidden>
+      <div class="hairline-rule hairline-rule--short" style="margin: 0 auto 14px;"></div>
+      <h2 class="empty-state__title">일치하는 레퍼런스가 없습니다</h2>
+      <p class="empty-state__desc">
+        검색어의 표현을 조금 넓히거나 선택된 프로젝트 주제·카테고리 필터를 초기화해 보세요.
+      </p>
+      <button type="button" class="btn-primary" id="emptyResetBtn">전체 레퍼런스 보기</button>
+    </div>
+  </main>
+
+  <!-- Floating Compare Dock -->
+  <div class="compare-dock" id="compareDock" role="region" aria-label="후보 비교 선택 바">
+    <div class="compare-dock__thumbs" id="compareDockThumbs"></div>
+    <div class="compare-dock__info" id="compareDockInfo">
+      <strong>0</strong> / 4 선택됨
+    </div>
+    <div class="compare-dock__actions">
+      <button type="button" class="btn-ghost" id="clearCompareBtn">선택 해제</button>
+      <button type="button" class="btn-primary" id="openCompareModalBtn" disabled>나란히 비교하기</button>
+    </div>
+  </div>
+
+  <!-- 4.4 Mahogany Brown Footer Band -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-wordmark">MOABOM</span>
+        <span class="footer-slogan">흩어진 디자인 레퍼런스를 한곳에 모아, AI로 정리하고 자연어로 쉽게 봄</span>
+      </div>
+
+      <div class="footer-stats">
+        <div class="footer-stat">
+          <span class="footer-stat__label">총 레퍼런스</span>
+          <span class="footer-stat__value" id="statTotalRefs">10</span>
+        </div>
+        <div class="footer-stat">
+          <span class="footer-stat__label">검토 완료율</span>
+          <span class="footer-stat__value" id="statVerifiedRate">70%</span>
+        </div>
+        <div class="footer-stat">
+          <span class="footer-stat__label">누적 검색 횟수</span>
+          <span class="footer-stat__value" id="statSearchCount">0</span>
+        </div>
+        <button type="button" class="footer-log-btn" id="openLogsModalBtn">
+          사용 로그 · AI 아키텍처
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       Modal 1: Detail Lightbox & Human-in-the-loop Review View
+       ======================================================================== -->
+  <div class="modal-backdrop" id="lightboxModal" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <div class="modal-panel modal-panel--lightbox">
+      <button type="button" class="modal-close-btn" data-close-modal="lightboxModal" aria-label="상세 창 닫기">×</button>
+
+      <div class="lightbox-split">
+        <!-- Left 60%: Artwork Preview -->
+        <div class="lightbox-media">
+          <button type="button" class="lightbox-nav-btn lightbox-nav-btn--prev" id="lightboxPrevBtn" aria-label="이전 레퍼런스">‹</button>
+          <img id="lightboxImg" class="lightbox-media__img" src="" alt="" />
+          <button type="button" class="lightbox-nav-btn lightbox-nav-btn--next" id="lightboxNextBtn" aria-label="다음 레퍼런스">›</button>
+
+          <div class="lightbox-media__bar">
+            <span id="lightboxFilename">ref_01.webp</span>
+            <span id="lightboxSource">내장 샘플</span>
+          </div>
+        </div>
+
+        <!-- Right 40%: Human-in-the-loop Metadata Inspector -->
+        <div class="lightbox-inspector">
+          <div class="inspector-top-meta">
+            <button type="button" id="lightboxStatusBtn" class="status-toggle-btn status-toggle-btn--verified" title="클릭하여 검수 상태 전환">
+              <span id="lightboxStatusDot">●</span>
+              <span id="lightboxStatusText">검토 완료</span>
+            </button>
+
+            <button type="button" id="lightboxCompareBtn" class="btn-outline" style="height:30px; font-size:0.75rem;">
+              + 비교 담기
+            </button>
+          </div>
+
+          <div>
+            <div class="hairline-rule"></div>
+            <h2 class="inspector-title" id="lightboxTitle">레퍼런스 제목</h2>
+            <div class="inspector-topic-row" style="margin-top:6px;">
+              <span>프로젝트 주제:</span>
+              <span id="lightboxTopic" style="color: var(--color-ink); font-weight:500;">주제</span>
+            </div>
+          </div>
+
+          <!-- Inline Editable One-line Description -->
+          <div>
+            <div class="inspector-section-label">
+              <span>한 줄 설명 (클릭하여 직접 수정)</span>
+              <button type="button" class="btn-ghost" id="editDescTriggerBtn" style="padding:2px 6px; font-size:0.73rem;">수정</button>
+            </div>
+            <div id="lightboxDescView" class="inline-desc-box" tabindex="0" role="button" title="클릭해서 설명 문구 수정"></div>
+            <div id="lightboxDescEditWrap" hidden>
+              <textarea id="lightboxDescTextarea" class="inline-desc-editor" rows="3"></textarea>
+              <div class="inline-edit-actions">
+                <button type="button" class="btn-ghost" id="cancelDescBtn">취소</button>
+                <button type="button" class="btn-primary" id="saveDescBtn" style="height:32px; padding:0 14px; font-size:0.78rem;">저장</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4-Category Tag Editor -->
+          <div>
+            <div class="inspector-section-label">
+              <span>4대 구조화 태그 (Human-in-the-loop 교정)</span>
+            </div>
+            <div class="tag-categories-list" id="lightboxTagEditor"></div>
+          </div>
+
+          <div class="inspector-footer">
+            <button type="button" class="btn-outline" id="lightboxPickBtn">☆ 최종 선별</button>
+            <button type="button" class="btn-ghost" id="lightboxDeleteBtn" style="color:#8E2F2F;">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Modal 2: Add Reference & AI Analysis Pipeline
+       ======================================================================== -->
+  <div class="modal-backdrop" id="addModal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
+    <div class="modal-panel modal-panel--add">
+      <button type="button" class="modal-close-btn" data-close-modal="addModal" aria-label="등록 창 닫기">×</button>
+
+      <div class="modal-header">
+        <div class="hairline-rule hairline-rule--short"></div>
+        <h2 class="modal-title" id="addModalTitle">새 레퍼런스 수집 및 AI 자동 분석</h2>
+        <p class="modal-subtitle">
+          이미지와 프로젝트 주제를 입력하면 멀티모달 AI 파이프라인이 4대 카테고리 태그와 한 줄 설명을 생성합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <!-- Dropzone -->
+        <div class="upload-dropzone" id="uploadDropzone" tabindex="0" role="button" aria-label="이미지 파일 드래그 앤 드롭 또는 선택">
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple hidden />
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B5A3C" stroke-width="1.6" style="margin: 0 auto;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <p class="upload-dropzone__title">레퍼런스 이미지를 드래그하거나 클릭하여 업로드</p>
+          <p class="upload-dropzone__sub">JPG, PNG, WEBP 지원 · 단일 또는 다중 이미지 동시 분석 가능</p>
+        </div>
+
+        <div class="upload-preview-strip" id="uploadPreviewStrip" hidden></div>
+
+        <!-- Project Topic Input -->
+        <div class="form-field">
+          <label class="form-label" for="projectTopicInput">프로젝트 주제 (태깅 정확도 향상을 위한 맥락 입력)</label>
+          <input
+            type="text"
+            id="projectTopicInput"
+            class="form-input"
+            placeholder="예: 친환경 스킨케어 패키지 리뉴얼, 금융 매거진 편집 디자인"
+          />
+          <div class="topic-suggestions" id="topicSuggestions"></div>
+        </div>
+
+        <!-- PRD Prompt Preview -->
+        <div class="prompt-callout">
+          <div class="prompt-callout__label">적용 AI 분석 프롬프트 (4대 태그 JSON 구조화 제약)</div>
+          “이미지의 주요 대상, 색감, 분위기, 구성, 디자인 스타일을 분석하고 검색에 유용한 태그와 한 줄 설명을 작성해줘.”
+        </div>
+
+        <!-- Optional Gemini API Key -->
+        <details class="api-details">
+          <summary>Gemini API 키 설정 (선택 · 미입력 시 내장 스마트 자동 분석 실행)</summary>
+          <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <input
+              type="password"
+              id="geminiApiKeyInput"
+              class="form-input"
+              style="height:34px; font-size:0.8rem;"
+              placeholder="AIza... (브라우저 LocalStorage에만 저장됩니다)"
+            />
+            <button type="button" class="btn-outline" id="saveApiKeyBtn" style="height:34px;">저장</button>
+          </div>
+          <p style="margin:6px 0 0; font-size:0.74rem; color:var(--color-ink-muted);">
+            API 키가 있으면 Gemini 2.5 Flash 멀티모달 API를 직접 호출하고, 비어 있으면 캔버스 색감·구도 추출과 프로젝트 주제 컨텍스트 엔진이 즉시 분석합니다.
+          </p>
+        </details>
+
+        <!-- Pipeline Visualization -->
+        <div class="pipeline-steps" id="pipelineSteps" hidden>
+          <div class="pipeline-step" data-step="1">1. 이미지 수집</div>
+          <div class="pipeline-step" data-step="2">2. 멀티모달 특징 분석</div>
+          <div class="pipeline-step" data-step="3">3. 4대 태그·설명 생성</div>
+          <div class="pipeline-step" data-step="4">4. 보드 저장 준비</div>
+        </div>
+
+        <div class="generated-output-list" id="generatedOutputList" hidden></div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-ghost" data-close-modal="addModal">취소</button>
+          <button type="button" class="btn-primary" id="runAnalyzeBtn" disabled>AI 분석 실행</button>
+          <button type="button" class="btn-primary" id="commitAnalyzedBtn" hidden>보드에 저장하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Modal 3: Compare View (2~4 Candidates Side-by-Side)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+    <div class="modal-panel modal-panel--compare">
+      <button type="button" class="modal-close-btn" data-close-modal="compareModal" aria-label="비교 창 닫기">×</button>
+
+      <div class="modal-header">
+        <div class="hairline-rule hairline-rule--short"></div>
+        <h2 class="modal-title" id="compareModalTitle">후보 레퍼런스 나란히 비교</h2>
+        <p class="modal-subtitle">
+          선택한 후보들의 이미지, 한 줄 설명, 4대 카테고리 태그를 대조하며 프로젝트에 가장 적합한 레퍼런스를 선별하세요.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="compare-shared-bar" id="compareSharedBar"></div>
+        <div class="compare-grid" id="compareGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Modal 4: Usage Logs, Archive Analytics & AI Architecture
+       ======================================================================== -->
+  <div class="modal-backdrop" id="logsModal" role="dialog" aria-modal="true" aria-labelledby="logsModalTitle">
+    <div class="modal-panel modal-panel--logs">
+      <button type="button" class="modal-close-btn" data-close-modal="logsModal" aria-label="로그 창 닫기">×</button>
+
+      <div class="modal-header">
+        <div class="hairline-rule hairline-rule--short"></div>
+        <h2 class="modal-title" id="logsModalTitle">모아봄(Moabom) 시스템 아키텍처 &amp; 사용 로그</h2>
+        <p class="modal-subtitle">
+          LocalStorage에 영구 저장되는 레퍼런스 검수 현황 및 자연어 검색 세션 로그입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="arch-flow-grid">
+          <div class="arch-card">
+            <div class="arch-card__step">STEP 1 · HUMAN</div>
+            <div class="arch-card__title">이미지 수집 &amp; 주제 입력</div>
+            <div class="arch-card__desc">레퍼런스 이미지와 프로젝트 주제를 함께 입력해 분석 맥락 제공</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card__step">STEP 2 · MULTIMODAL AI</div>
+            <div class="arch-card__title">시각 특징·색감·구도 분석</div>
+            <div class="arch-card__desc">이미지 주요 대상, 색감, 구도, 디자인 스타일 및 매체 특성 인식</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card__step">STEP 3 · LLM</div>
+            <div class="arch-card__title">4대 태그 &amp; 한 줄 설명 JSON</div>
+            <div class="arch-card__desc">색감·구성·분위기·매체 4대 분류 태그와 검색용 한 줄 설명 생성</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card__step">STEP 4 · BOARD / DB</div>
+            <div class="arch-card__title">이미지 보드 LocalStorage 저장</div>
+            <div class="arch-card__desc">원본 이미지와 구조화 메타데이터, 검수 상태 자동 영속화</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card__step">STEP 5 · SEARCH ENGINE</div>
+            <div class="arch-card__title">키워드·자연어 질의 탐색</div>
+            <div class="arch-card__desc">한국어 자연어·유의어 매칭 및 주제·카테고리 교차 필터링</div>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card__step">STEP 6 · HUMAN-IN-THE-LOOP</div>
+            <div class="arch-card__title">태그 교정 및 후보 비교 선별</div>
+            <div class="arch-card__desc">AI 초안 직접 수정·검토 완료 처리 후 2~4개 나란히 비교 선별</div>
+          </div>
+        </div>
+
+        <div class="inspector-section-label" style="margin-bottom:8px;">
+          <span>검색 및 활동 세션 로그 (최근 50건)</span>
+          <span id="logSummaryBadge" style="font-weight:500; color:var(--color-ink-muted);"></span>
+        </div>
+        <div class="log-table-wrap">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>시각</th>
+                <th>유형</th>
+                <th>내용 / 질의어</th>
+                <th>결과</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="modal-footer-actions" style="justify-content: space-between;">
+          <button type="button" class="btn-outline" id="resetSampleDataBtn">초기 샘플 10종으로 복원</button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn-outline" id="exportJsonBtn">아카이브 JSON 내보내기</button>
+            <button type="button" class="btn-primary" data-close-modal="logsModal">닫기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Banner -->
+  <div class="toast-banner" id="toastBanner" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
