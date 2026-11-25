@@ -10,7 +10,7 @@ const TAG_CATEGORIES = ['색감', '구성', '분위기', '매체'];
 const INITIAL_REFERENCES = [
   {
     id: 'ref_01',
-    image: 'public/sample/ref_01.webp',
+    image: 'ref_01.webp',
     filename: 'ref_01.webp',
     title: '클래식 건축 에디토리얼 스프레드',
     projectTopic: '금융·건축 매거진 편집 디자인',
@@ -29,7 +29,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_02',
-    image: 'public/sample/ref_02.webp',
+    image: 'ref_02.webp',
     filename: 'ref_02.webp',
     title: '코트 컬렉션 패션 룩북',
     projectTopic: 'F/W 어패럴 브랜드 룩북',
@@ -48,7 +48,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_03',
-    image: 'public/sample/ref_03.webp',
+    image: 'ref_03.webp',
     filename: 'ref_03.webp',
     title: '보태니컬 아포테케리 패키지',
     projectTopic: '친환경 스킨케어 패키지 리뉴얼',
@@ -67,7 +67,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_04',
-    image: 'public/sample/ref_04.webp',
+    image: 'ref_04.webp',
     filename: 'ref_04.webp',
     title: '기하학 스위스 전시 포스터',
     projectTopic: '현대 타이포그래피 기획전 홍보',
@@ -86,7 +86,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_05',
-    image: 'public/sample/ref_05.webp',
+    image: 'ref_05.webp',
     filename: 'ref_05.webp',
     title: '린넨 하드커버 아트북 표지',
     projectTopic: '갤러리 아카이브 전시 도록',
@@ -105,7 +105,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_06',
-    image: 'public/sample/ref_06.webp',
+    image: 'ref_06.webp',
     filename: 'ref_06.webp',
     title: '건축 아카이브 웹 UI 레이아웃',
     projectTopic: '온라인 뮤지엄 큐레이션 웹',
@@ -124,7 +124,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_07',
-    image: 'public/sample/ref_07.webp',
+    image: 'ref_07.webp',
     filename: 'ref_07.webp',
     title: '스페셜티 커피 드립백 브랜딩',
     projectTopic: '로스터리 카페 패키지 아이덴티티',
@@ -143,7 +143,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_08',
-    image: 'public/sample/ref_08.webp',
+    image: 'ref_08.webp',
     filename: 'ref_08.webp',
     title: '브루탈리즘 콘크리트 건축 사진',
     projectTopic: '공간 브랜드 무드보드 리서치',
@@ -162,7 +162,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_09',
-    image: 'public/sample/ref_09.webp',
+    image: 'ref_09.webp',
     filename: 'ref_09.webp',
     title: '하프톤 추상 그래픽 아트 프린트',
     projectTopic: '뮤직 페스티벌 비주얼 아이덴티티',
@@ -181,7 +181,7 @@ const INITIAL_REFERENCES = [
   },
   {
     id: 'ref_10',
-    image: 'public/sample/ref_10.webp',
+    image: 'ref_10.webp',
     filename: 'ref_10.webp',
     title: '핸드메이드 코튼 종이 텍스처',
     projectTopic: '프리미엄 지류·인쇄 후가공 참고',
